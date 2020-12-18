@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="noClick">#FFFFFF</color>
+    <color name="clicked">#A3D9F3</color>
+    <color name="noClickNumber">#CBD5D0</color>
+    <color name="click_around">#D2DFD9</color>
+    <color name="inputNum">#03A9F4</color>
+    <color name="click_same">#64B8E1</color>
+    <color name="errorSame">#EAACAA</color>
+    <color name="errorNum">#E53935</color>
+    <color name="theme_color">#F6F8F2</color>
+    <color name="black">#050700</color>
+    <color name="gray">#BFC1B9</color>
+
+</resources>

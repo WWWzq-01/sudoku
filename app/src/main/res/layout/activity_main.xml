@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <Button
+        android:id="@+id/button_easy"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_bg"
+        android:text="Easy"
+        android:textAllCaps="false" />
+
+    <ImageView
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_above="@id/button_easy"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+
+        android:background="@mipmap/logo" />
+
+    <Button
+        android:id="@+id/button_normal"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_easy"
+        android:layout_alignStart="@id/button_easy"
+        android:layout_alignLeft="@id/button_easy"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_bg"
+        android:text="Normal"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/button_hard"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_normal"
+        android:layout_alignStart="@id/button_normal"
+        android:layout_alignLeft="@id/button_normal"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_bg"
+        android:text="Hard"
+        android:textAllCaps="false" />
+
+</RelativeLayout>
