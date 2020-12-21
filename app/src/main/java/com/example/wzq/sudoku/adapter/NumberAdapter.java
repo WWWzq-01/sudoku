@@ -69,19 +69,19 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumberHold
         this.callback = callback;
     }
 
-    class NumberHolder extends RecyclerView.ViewHolder {
+    static class NumberHolder extends RecyclerView.ViewHolder {
 
         private TextView textView;
         private CardView cardView;
         private int value;
 
-        public NumberHolder(@NonNull View itemView) {
+        private NumberHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.number_text);
             cardView = itemView.findViewById(R.id.number_card);
         }
 
-        public void setValue(int value) {
+        private void setValue(int value) {
             if (value == 10) {
                 this.value = 0;
                 textView.setBackgroundResource(R.drawable.error);

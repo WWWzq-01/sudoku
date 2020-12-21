@@ -21,11 +21,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     private List<Integer> noteList = new ArrayList<>(9);
 
-   private List<NoteViewHolder> holders = new ArrayList<>(9);
+    private List<NoteViewHolder> holders = new ArrayList<>(9);
 
 
-
-    public NoteAdapter() {
+    NoteAdapter() {
         for (int i = 0; i < 9; i++) {
             noteList.add(0);
         }
@@ -37,14 +36,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.note_item, parent, false);
-        NoteViewHolder holder = new NoteViewHolder(view);
-        holders.add(holder);
-        return holder;
+        return new NoteViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         Integer value = noteList.get(position);
+        holders.add(holder);
         holder.setValue(value);
     }
 
@@ -56,12 +54,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     @Override
     public void onClick(int number) {
         if (number == 0) {
-            for (Integer v : noteList) {
-                v = 0;
-            }
+            setNull();
+        } else if (noteList.contains(number)) {
+            noteList.set(number-1,0);
+            holders.get(number-1).setValue(0);
         } else {
             noteList.set(number - 1, number);
             holders.get(number-1).setValue(number);
+        }
+    }
+
+    void setNull() {
+        for (int i = 0; i < 9; i++) {
+            noteList.set(i, 0);
+            holders.get(i).setValue(0);
         }
     }
 
@@ -70,19 +76,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         private TextView textView;
 
 
-        public NoteViewHolder(@NonNull View itemView) {
+        private NoteViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.note_text);
         }
 
-        public void setValue(int value) {
+        private void setValue(int value) {
             textView.setText(value > 0 ? String.valueOf(value) : "");
-        }
-    }
-    public void setNull() {
-        for(int i=0;i<9;i++) {
-            noteList.set(i,0);
-            holders.get(i).setValue(0);
         }
     }
 }

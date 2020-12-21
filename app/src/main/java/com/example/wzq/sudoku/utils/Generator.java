@@ -3,6 +3,9 @@ package com.example.wzq.sudoku.utils;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * @author wzq20
+ */
 public class Generator {
     /**
      * the width of sudoku map
