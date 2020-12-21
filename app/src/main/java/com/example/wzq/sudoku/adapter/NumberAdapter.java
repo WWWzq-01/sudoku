@@ -1,7 +1,6 @@
-package com.example.wzq.sudoku.Adapter;
+package com.example.wzq.sudoku.adapter;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;

@@ -1,4 +1,4 @@
-package com.example.wzq.sudoku.Adapter;
+package com.example.wzq.sudoku.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -31,13 +31,17 @@ import java.util.Set;
  */
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
 
-    private static final String NO_CLICK = "noClick";
+    private final String NO_CLICK = "noClick";
 
-    private static final String CLICK_AROUND = "clickAround";
+    private final String CLICK_AROUND = "clickAround";
 
-    private static final String CLICK_SAME = "clickSame";
+    private final String CLICK_SAME = "clickSame";
 
-    private static final String ERROR_SAME = "errSame";
+    private final String ERROR_SAME = "errSame";
+
+    private final int MAP_SIDE_LEN = 9;
+
+    private final int BLOCK_SIDE_LEN =3;
 
     private Set<Integer> errNumSet;
 
@@ -50,8 +54,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
 
     private int curNum = 0;
 
-    private RecyclerView.LayoutManager layoutManager;
-
     private Callback callback;
 
     private Context context;
@@ -60,17 +62,16 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
 
     private NoteAdapter[] noteAdapters = new NoteAdapter[81];
 
-//    private GameHolder [] gameHolders = new GameHolder[81];
+    private GameHolder[] gameHolders = new GameHolder[81];
 
     private boolean isNoting = false;
 
     private ColorHelper colorHelper;
 
 
-    public GameAdapter(Context context, List<Point> data, RecyclerView.LayoutManager layoutManager) {
+    public GameAdapter(Context context, List<Point> data) {
         this.data = data;
         colorHelper = new ColorHelper(context);
-        this.layoutManager = layoutManager;
         errNumSet = new HashSet<>();
         this.context = context;
     }
@@ -82,15 +83,25 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
     public GameHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cell_item, parent, false);
-        final GameHolder holder = new GameHolder(view);
 
-        view.setOnClickListener(v -> {
-            int position = holder.getAdapterPosition();
-            if (isNoting && canChange[position]) {
-                if (!initialized[position]) {
+        return new GameHolder(view);
+
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onBindViewHolder(@NonNull GameHolder holder, int position) {
+        Point point = data.get(position);
+        holder.setValue(point.getValue());
+        gameHolders[position] = holder;
+        holder.itemView.setBackgroundColor(colorHelper.NO_CLICK);
+        holder.itemView.setOnClickListener(v -> {
+            int pos = holder.getAdapterPosition();
+            if (isNoting && canChange[pos]) {
+                if (!initialized[pos]) {
                     NoteAdapter noteAdapter = new NoteAdapter();
                     holder.notes.setAdapter(noteAdapter);
-                    noteAdapters[position] = noteAdapter;
+                    noteAdapters[pos] = noteAdapter;
                     holder.notes.setOnTouchListener((v1, motionEvent) -> {
                         if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                             return holder.itemView.callOnClick();
@@ -98,13 +109,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
                         return false;
                     });
                     holder.notes.setLayoutManager(new GridLayoutManager(context, 3));
-                    initialized[position] = true;
+                    initialized[pos] = true;
                 }
                 holder.notes.setVisibility(View.VISIBLE);
                 holder.textView.setVisibility(View.GONE);
             }
 
-            callback = noteAdapters[position];
+            callback = noteAdapters[pos];
 
 //             如果这次点击的与上次相同，则取消上次点击状态
             if (holder == clicked) {
@@ -135,18 +146,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
                 clicked = holder;
                 setClickedAroundColor(CLICK_AROUND);
                 setClickSameColor(CLICK_SAME);
-                view.setBackgroundColor(colorHelper.CLICKED);
+                holder.itemView.setBackgroundColor(colorHelper.CLICKED);
             }
         });
-        return holder;
-
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull GameHolder holder, int position) {
-        Point point = data.get(position);
-        holder.setValue(point.getValue());
-        holder.itemView.setBackgroundColor(colorHelper.NO_CLICK);
     }
 
     public void click(int number) {
@@ -197,27 +199,27 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         int y = position % 9;
         int i, j;
         boolean equal;
-        for (i = 0; i < 9; i++) {
-            for (j = 0; j < 9; j++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
+            for (j = 0; j < MAP_SIDE_LEN; j++) {
                 equal = map[i][j] == map[x][y] && (i != x && j != y);
                 if (equal) {
-                    layoutManager.findViewByPosition(i * 9 + j).setBackgroundColor(colorHelper.NO_CLICK);
+                    gameHolders[i * 9 + j].itemView.setBackgroundColor(colorHelper.NO_CLICK);
                 }
             }
         }
         int tmpPos;
-        for (i = 0; i < 9; i++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
             tmpPos = x * 9 + i;
             if (i != y) {
                 errNumSet.remove(tmpPos);
-                layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorHelper.CLICK_AROUND);
+                gameHolders[tmpPos].itemView.setBackgroundColor(colorHelper.CLICK_AROUND);
             }
         }
-        for (i = 0; i < 9; i++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
             tmpPos = i * 9 + y;
             if (i != x) {
                 errNumSet.remove(tmpPos);
-                layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorHelper.CLICK_AROUND);
+                gameHolders[tmpPos].itemView.setBackgroundColor(colorHelper.CLICK_AROUND);
 
             }
         }
@@ -225,12 +227,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         int minX = x / 3 * 3;
         int minY = y / 3 * 3;
 
-        for (i = minX; i < minX + 3; i++) {
-            for (j = minY; j < minY + 3; j++) {
+        for (i = minX; i < minX + BLOCK_SIDE_LEN; i++) {
+            for (j = minY; j < minY + BLOCK_SIDE_LEN; j++) {
                 tmpPos = i * 9 + j;
                 if (i != x && j != y) {
                     errNumSet.remove(tmpPos);
-                    layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorHelper.CLICK_AROUND);
+                    gameHolders[tmpPos].itemView.setBackgroundColor(colorHelper.CLICK_AROUND);
 
                 }
             }
@@ -278,8 +280,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
     public void setMap(int[][] map) {
         curNum = 0;
         this.map = map;
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+        for (int i = 0; i < MAP_SIDE_LEN; i++) {
+            for (int j = 0; j < MAP_SIDE_LEN; j++) {
                 int pos = i * 9 + j;
                 if (map[i][j] > 0) {
                     canChange[pos] = false;
@@ -321,20 +323,20 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         x = position / 9;
         y = position % 9;
 
-        for (i = 0; i < 9; i++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
             tmpPos = x * 9 + i;
             if (i != y) {
                 if (!errNumSet.contains(tmpPos)) {
-                    layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                    gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
 
                 }
             }
         }
-        for (i = 0; i < 9; i++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
             tmpPos = i * 9 + y;
             if (i != x) {
                 if (!errNumSet.contains(tmpPos)) {
-                    layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                    gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
                 }
             }
         }
@@ -342,12 +344,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         int minX = x / 3 * 3;
         int minY = y / 3 * 3;
 
-        for (i = minX; i < minX + 3; i++) {
-            for (j = minY; j < minY + 3; j++) {
+        for (i = minX; i < minX + BLOCK_SIDE_LEN; i++) {
+            for (j = minY; j < minY + BLOCK_SIDE_LEN; j++) {
                 tmpPos = i * 9 + j;
                 if (i != x && j != y) {
                     if (!errNumSet.contains(tmpPos)) {
-                        layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                        gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
                     }
                 }
             }
@@ -377,7 +379,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         num = map[x][y];
 
 
-        for (i = 0; i < 9; i++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
             tmpPos = x * 9 + i;
             if (i != y && map[x][i] == num) {
                 if (s.equals(CLICK_AROUND)) {
@@ -386,10 +388,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
                     errNumSet.add(tmpPos);
                 }
 
-                layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
             }
         }
-        for (i = 0; i < 9; i++) {
+        for (i = 0; i < MAP_SIDE_LEN; i++) {
             tmpPos = i * 9 + y;
             if (i != x && map[i][y] == num) {
                 if (s.equals(CLICK_AROUND)) {
@@ -397,15 +399,15 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
                 } else if (s.equals(ERROR_SAME)) {
                     errNumSet.add(tmpPos);
                 }
-                layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
             }
         }
         //(minX,minY)是(x,y)所属小九宫格的左上角的坐标
         int minX = x / 3 * 3;
         int minY = y / 3 * 3;
 
-        for (i = minX; i < minX + 3; i++) {
-            for (j = minY; j < minY + 3; j++) {
+        for (i = minX; i < minX + BLOCK_SIDE_LEN; i++) {
+            for (j = minY; j < minY + BLOCK_SIDE_LEN; j++) {
                 tmpPos = i * 9 + j;
                 if (i != x && j != y && map[i][j] == num) {
                     if (s.equals(CLICK_AROUND)) {
@@ -413,7 +415,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
                     } else if (s.equals(ERROR_SAME)) {
                         errNumSet.add(tmpPos);
                     }
-                    layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                    gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
                 }
             }
         }
@@ -441,12 +443,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         y = position % 9;
         int value = map[x][y];
         if (value != 0) {
-            for (i = 0; i < 9; i++) {
-                for (j = 0; j < 9; j++) {
+            for (i = 0; i < MAP_SIDE_LEN; i++) {
+                for (j = 0; j < MAP_SIDE_LEN; j++) {
                     if (map[i][j] == value && (i * 9 + j) != position) {
                         tmpPos = i * 9 + j;
                         if (!errNumSet.contains(tmpPos)) {
-                            layoutManager.findViewByPosition(tmpPos).setBackgroundColor(colorId);
+                            gameHolders[tmpPos].itemView.setBackgroundColor(colorId);
                         }
                     }
                 }
@@ -460,11 +462,15 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         if (clicked == null) {
             return;
         }
-        GameHolder tmp = clicked;
+
         // 如果已经有点击的子项，
         int position = clicked.getAdapterPosition();
+        if (!canChange[position]) {
+            return;
+        }
         int x = position / 9;
         int y = position % 9;
+        GameHolder tmp = clicked;
         if (bl) {
             if (!initialized[position]) {
                 NoteAdapter noteAdapter = new NoteAdapter();
@@ -510,13 +516,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         private TextView textView;
         private RecyclerView notes;
 
-        public GameHolder(@NonNull View itemView) {
+        private GameHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.cell_text);
             notes = itemView.findViewById(R.id.notes_list);
         }
 
-        public void setValue(int value) {
+        private void setValue(int value) {
             textView.setText(value > 0 ? String.valueOf(value) : "");
         }
     }

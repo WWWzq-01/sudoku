@@ -1,4 +1,4 @@
-package com.example.wzq.sudoku.Adapter;
+package com.example.wzq.sudoku.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

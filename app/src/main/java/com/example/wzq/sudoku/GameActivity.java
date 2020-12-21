@@ -14,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.wzq.sudoku.Adapter.GameAdapter;
-import com.example.wzq.sudoku.Adapter.NumberAdapter;
+import com.example.wzq.sudoku.adapter.GameAdapter;
+import com.example.wzq.sudoku.adapter.NumberAdapter;
 import com.example.wzq.sudoku.utils.Generator;
 import com.example.wzq.sudoku.view.Callback;
 import com.example.wzq.sudoku.view.MapDivider;
@@ -84,7 +84,7 @@ public class GameActivity extends AppCompatActivity implements Callback {
                 data.add(point);
             }
         }
-        gameAdapter = new GameAdapter(this, data,gridLayoutManager);
+        gameAdapter = new GameAdapter(this, data);
         gameAdapter.setMap(map);
         gameView.setAdapter(gameAdapter);
 
