@@ -10,6 +10,9 @@ import android.widget.Button;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * @author wzq20
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private int minCount;
@@ -20,9 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.GRAY);
-        }
+        getWindow().setStatusBarColor(Color.GRAY);
         setContentView(R.layout.activity_main);
 
         Button btnEasy = findViewById(R.id.button_easy);

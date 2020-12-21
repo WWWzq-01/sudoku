@@ -3,10 +3,10 @@ package com.example.wzq.sudoku;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -14,11 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wzq.sudoku.Adapter.GameAdapter;
+import com.example.wzq.sudoku.Adapter.NumberAdapter;
 import com.example.wzq.sudoku.utils.Generator;
 import com.example.wzq.sudoku.view.Callback;
 import com.example.wzq.sudoku.view.MapDivider;
-import com.example.wzq.sudoku.view.GameAdapter;
-import com.example.wzq.sudoku.view.NumberAdapter;
 import com.example.wzq.sudoku.view.Point;
 
 import java.util.ArrayList;
@@ -29,12 +29,14 @@ import java.util.TimerTask;
 public class GameActivity extends AppCompatActivity implements Callback {
 
     private static final int UPDATE_TEXT = 1;
-    private NumberAdapter numberAdapter;
     private GameAdapter gameAdapter;
     private Timer timer;
     private TextView textView;
+    private ImageView noteImage;
     private long startTime;
     private int count;
+    private boolean isNoting = false;
+
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -53,9 +55,7 @@ public class GameActivity extends AppCompatActivity implements Callback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.GRAY);
-        }
+        getWindow().setStatusBarColor(Color.GRAY);
         setContentView(R.layout.activity_game);
         Intent intent = getIntent();
         count = intent.getIntExtra("num", 50);
@@ -73,7 +73,6 @@ public class GameActivity extends AppCompatActivity implements Callback {
         };
         gameView.setLayoutManager(gridLayoutManager);
         numberView.setLayoutManager(new GridLayoutManager(this, 5));
-
         List<Point> data = new ArrayList<>();
 
         int[][] map;
@@ -93,9 +92,10 @@ public class GameActivity extends AppCompatActivity implements Callback {
         // 设置分割线颜色为灰色
         mapDivider.setDrawable(getResources().getDrawable(R.drawable.gray_divider));
         gameView.addItemDecoration(mapDivider);
-        numberAdapter = new NumberAdapter();
+        NumberAdapter numberAdapter = new NumberAdapter();
         numberView.setAdapter(numberAdapter);
         numberAdapter.setCallback(this);
+
 
         textView = findViewById(R.id.time);
         startTime = System.currentTimeMillis();
@@ -112,15 +112,31 @@ public class GameActivity extends AppCompatActivity implements Callback {
         };
         timer = new Timer();
         timer.schedule(task, 0, 100L);
+
+        noteImage = findViewById(R.id.note_image);
+        noteImage.setColorFilter(Color.BLACK);
+        noteImage.setOnClickListener(v -> {
+            if (isNoting) {
+                isNoting = false;
+                noteImage.setColorFilter(Color.BLACK);
+            } else {
+                isNoting = true;
+                noteImage.setColorFilter(Color.BLUE);
+            }
+            gameAdapter.setNotes(isNoting);
+        });
     }
 
     @Override
     public void onClick(int number) {
-        gameAdapter.click(number);
+        if (isNoting) {
+            gameAdapter.note(number);
+        } else {
+            gameAdapter.click(number);
+        }
         if (gameAdapter.isFull()) {
             showWin();
         }
-
     }
 
     private void showWin() {

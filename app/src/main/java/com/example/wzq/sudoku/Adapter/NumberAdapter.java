@@ -1,8 +1,7 @@
-package com.example.wzq.sudoku.view;
+package com.example.wzq.sudoku.Adapter;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,11 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.wzq.sudoku.R;
+import com.example.wzq.sudoku.view.Callback;
 
-import static android.content.ContentValues.TAG;
-
+/**
+ * @author wzq20
+ */
 public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumberHolder> {
 
     private int clickNum = -1;
@@ -31,7 +31,7 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumberHold
                 .inflate(R.layout.number_item, parent, false);
         NumberHolder holder = new NumberHolder(view);
         int defaultColor = holder.cardView.getCardBackgroundColor().getDefaultColor();
-        int clickColor = view.getResources().getColor(R.color.clicked);
+        int clickColor = view.getResources().getColor(R.color.clicked,null);
         view.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_UP:
@@ -83,11 +83,9 @@ public class NumberAdapter extends RecyclerView.Adapter<NumberAdapter.NumberHold
         }
 
         public void setValue(int value) {
-            if(value == 10){
+            if (value == 10) {
                 this.value = 0;
-                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN){
-                    textView.setBackgroundResource(R.drawable.error);
-                }
+                textView.setBackgroundResource(R.drawable.error);
                 return;
             }
             this.value = value;
