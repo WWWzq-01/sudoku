@@ -1,6 +1,10 @@
 package com.example.wzq.sudoku.utils;
 
+import com.example.wzq.sudoku.solve.DLX;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -20,10 +24,14 @@ public class Generator {
 
     private static int[][] endMap = new int[MAP_WIDTH][MAP_WIDTH];
 
+    private static int[][] resMap = new int[MAP_WIDTH][MAP_WIDTH];
+
     /**
      * Determine whether the generation is complete
      */
     private static Boolean finished = false;
+
+//    private static DLX solver = new DLX();
 
     /**
      *
@@ -56,27 +64,101 @@ public class Generator {
         return true;
     }
 
-    public static int[][] generate(int num) {
-        generateRec(0);
+    public static int[][] getResMap() {
+        return resMap;
+    }
 
-        Random random = new Random();
-        ArrayList<Integer> list = new ArrayList<>(35);
-        for (int i = 0; i < num; i++) {
-            int index = random.nextInt(81);
-            while (list.contains(index)) {
-                index = random.nextInt(81);
+    public static int[][] generate(int num) {
+        boolean valid ;
+        do{
+            finished = false;
+            for(int i=0;i<9;i++){
+                Arrays.fill(tempMap[i],0);
             }
-            list.add(index);
-        }
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (list.contains(i * 9 + j)) {
-                    endMap[i][j] = 0;
-                }
+            generateRec(0);
+            for (int i = 0; i < 9; i++) {
+                System.arraycopy(endMap[i], 0, resMap[i], 0, 9);
             }
-        }
+
+            for (int i = 0; i < 9; i++) {
+                System.arraycopy(endMap[i], 0, tempMap[i], 0, 9);
+            }
+            valid = hollow(num);
+        } while (!valid);
+
+
+
         finished = false;
         return endMap;
+    }
+
+    private static boolean hollow(int count) {
+
+        Random random = new Random();
+        int pos, value;
+        int x, y;
+        boolean multi;
+        int freshCount = 0;
+        int max = count;
+
+        while (count != 0) {
+            if (freshCount > max) {
+                return false;
+            }
+            multi = false;
+            pos = random.nextInt(81);
+
+            x = pos / 9;
+            y = pos % 9;
+            while (endMap[x][y] == 0) {
+                pos = random.nextInt(81);
+                x = pos / 9;
+                y = pos % 9;
+            }
+            value = endMap[x][y];
+            for (int i = 1; i <= 9; i++) {
+                if (i != value) {
+                    if (isLegal(endMap, x, y, i)) {
+                        endMap[x][y] = i;
+                        multi = onlySolve(0);
+                    }
+                    if (multi) {
+                        freshCount++;
+                        endMap[x][y] = value;
+                        break;
+                    }
+                }
+            }
+            if (!multi) {
+                endMap[x][y] = 0;
+                count--;
+            }
+        }
+        return true;
+
+    }
+
+    private static boolean onlySolve(int k) {
+        if (k == 81) {
+            return true;
+        }
+        int x = k / 9;
+        int y = k % 9;
+        if (tempMap[x][y] != 0) {
+            return onlySolve(k + 1);
+        }
+        for (int i = 1; i <= 9; i++) {
+            if (isLegal(tempMap, x, y, i)) {
+                continue;
+            }
+            tempMap[x][y] = i;
+            if (onlySolve(k + 1)) {
+                return true;
+            }
+            tempMap[x][y] = 0;
+        }
+
+        return false;
     }
 
     private static void generateRec(int k) {
@@ -87,9 +169,8 @@ public class Generator {
 
             for (int i = 0; i < 9; i++) {
                 System.arraycopy(tempMap[i], 0, endMap[i], 0, 9);
-                System.out.println();
             }
-                finished = true;
+            finished = true;
             return;
         }
 
@@ -102,7 +183,7 @@ public class Generator {
             int index = 0;
             while (index < MAP_WIDTH) {
                 // list用来储存已经随机生成的1-9的数字
-                ArrayList<Integer> list = new ArrayList<>(9);
+                List<Integer> list = new ArrayList<>(9);
                 Random random = new Random();
                 int i = random.nextInt(9) + 1;
                 // 当list中包含数字i时，再重新生成1-9的数字

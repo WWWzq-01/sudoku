@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wzq.sudoku.R;
-import com.example.wzq.sudoku.view.Callback;
+import com.example.wzq.sudoku.utils.Callback;
 
 import java.util.ArrayList;
 import java.util.List;

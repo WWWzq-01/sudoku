@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,11 +26,14 @@ public class MapDivider extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider;
 
+    private Context context;
+
     private Resources resources;
 
     public MapDivider(Context context) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);
+        this.context =context;
         resources = context.getResources();
         a.recycle();
     }
@@ -46,8 +50,8 @@ public class MapDivider extends RecyclerView.ItemDecoration {
         int x, y;
         boolean isDrawHorizontalDivider;
         boolean isDrawVerticalDivider;
-        Drawable grayDivider = resources.getDrawable(R.drawable.gray_divider);
-        Drawable blackDivider = resources.getDrawable(R.drawable.black_divider);
+        Drawable grayDivider = resources.getDrawable(R.drawable.gray_divider,null);
+        Drawable blackDivider = resources.getDrawable(R.drawable.black_divider,null);
 
         for (int i = 0; i < childCount; i++) {
             isDrawVerticalDivider = true;

@@ -13,14 +13,15 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wzq.sudoku.R;
+import com.example.wzq.sudoku.utils.Callback;
 import com.example.wzq.sudoku.utils.ColorHelper;
 import com.example.wzq.sudoku.utils.Generator;
-import com.example.wzq.sudoku.view.Callback;
 import com.example.wzq.sudoku.view.Point;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ToDoubleBiFunction;
 
 /**
  * The adapter and controller of sudoku
@@ -41,33 +42,21 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
 
     private final int MAP_SIDE_LEN = 9;
 
-    private final int BLOCK_SIDE_LEN =3;
-
+    private final int BLOCK_SIDE_LEN = 3;
+    private final List<Point> data;
+    private final boolean[] canChange = new boolean[81];
+    private final boolean[] initialized = new boolean[81];
     private Set<Integer> errNumSet;
-
     private GameHolder clicked;
-
-    private List<Point> data;
     private int[][] map = new int[9][9];
-
-    private boolean[] canChange = new boolean[81];
-
+    private int[][] resMap = new int[9][9];
     private int curNum = 0;
-
     private Callback callback;
-
     private Context context;
-
-    private boolean[] initialized = new boolean[81];
-
     private NoteAdapter[] noteAdapters = new NoteAdapter[81];
-
     private GameHolder[] gameHolders = new GameHolder[81];
-
     private boolean isNoting = false;
-
     private ColorHelper colorHelper;
-
 
     public GameAdapter(Context context, List<Point> data) {
         this.data = data;
@@ -76,6 +65,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         this.context = context;
     }
 
+    public void setResMap(int[][] resMap) {
+        this.resMap = resMap;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @NonNull
@@ -173,6 +165,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
             delete(x, y);
             return;
         }
+        if(number == map[x][y] ) {
+            return;
+        }
         if (!Generator.isLegal(map, x, y, map[x][y])) {
             errNumSet.remove(x * 9 + y);
         }
@@ -185,6 +180,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
             setClickSameColor(CLICK_SAME);
         } else {
             setErrorSameColor(CLICK_AROUND);
+            curNum--;
             errNumSet.add(position);
             map[x][y] = number;
             clicked.textView.setTextColor(colorHelper.ERROR_NUM);
@@ -511,10 +507,37 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         map[x][y] = 0;
     }
 
+    public void hint() {
+        if (clicked == null) {
+            return;
+        }
+        int pos = clicked.getAdapterPosition();
+        if (!canChange[pos]) {
+            return;
+        }
+        if (noteAdapters[pos] != null) {
+            noteAdapters[pos].setNull();
+        }
+        clicked.notes.setVisibility(View.GONE);
+        clicked.textView.setVisibility(View.VISIBLE);
+        clicked.textView.setTextColor(colorHelper.HINT_NUM);
+        setLastNumColor();
+        canChange[pos] = false;
+
+        int x, y;
+        x = pos / 9;
+        y = pos % 9;
+        int value = resMap[x][y];
+        curNum++;
+
+        map[x][y] = value;
+        clicked.setValue(value);
+    }
+
     static class GameHolder extends RecyclerView.ViewHolder {
 
-        private TextView textView;
-        private RecyclerView notes;
+        private final TextView textView;
+        private final RecyclerView notes;
 
         private GameHolder(@NonNull View itemView) {
             super(itemView);

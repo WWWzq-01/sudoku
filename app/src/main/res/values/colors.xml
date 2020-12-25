@@ -8,6 +8,7 @@
     <color name="noClickNumber">#CBD5D0</color>
     <color name="clickAround">#D2DFD9</color>
     <color name="inputNum">#03A9F4</color>
+    <color name="hintNum">#D39A52</color>
     <color name="clickSame">#64B8E1</color>
     <color name="errorSame">#EAACAA</color>
     <color name="errorNum">#E53935</color>

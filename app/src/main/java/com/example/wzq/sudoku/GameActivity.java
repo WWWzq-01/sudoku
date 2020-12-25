@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.wzq.sudoku.adapter.GameAdapter;
 import com.example.wzq.sudoku.adapter.NumberAdapter;
 import com.example.wzq.sudoku.utils.Generator;
-import com.example.wzq.sudoku.view.Callback;
+import com.example.wzq.sudoku.utils.Callback;
 import com.example.wzq.sudoku.view.MapDivider;
 import com.example.wzq.sudoku.view.Point;
 
@@ -32,7 +32,10 @@ public class GameActivity extends AppCompatActivity implements Callback {
     private GameAdapter gameAdapter;
     private Timer timer;
     private TextView textView;
+    private RecyclerView gameView;
+    private ImageView restartImage;
     private ImageView noteImage;
+    private ImageView hintImage;
     private long startTime;
     private int count;
     private boolean isNoting = false;
@@ -63,7 +66,7 @@ public class GameActivity extends AppCompatActivity implements Callback {
     }
 
     private void init() {
-        RecyclerView gameView = findViewById(R.id.game);
+        gameView = findViewById(R.id.game);
         RecyclerView numberView = findViewById(R.id.keyboard);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 9) {
             @Override
@@ -73,19 +76,8 @@ public class GameActivity extends AppCompatActivity implements Callback {
         };
         gameView.setLayoutManager(gridLayoutManager);
         numberView.setLayoutManager(new GridLayoutManager(this, 5));
-        List<Point> data = new ArrayList<>();
+        gameAdapterReset();
 
-        int[][] map;
-        map = Generator.generate(count);
-
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                Point point = new Point(i, j, map[i][j]);
-                data.add(point);
-            }
-        }
-        gameAdapter = new GameAdapter(this, data);
-        gameAdapter.setMap(map);
         gameView.setAdapter(gameAdapter);
 
         MapDivider mapDivider = new MapDivider(this);
@@ -125,6 +117,38 @@ public class GameActivity extends AppCompatActivity implements Callback {
             }
             gameAdapter.setNotes(isNoting);
         });
+        hintImage = findViewById(R.id.hint_image);
+        hintImage.setOnClickListener(v->{
+            gameAdapter.hint();
+            if(gameAdapter.isFull()) {
+                showWin();
+            }
+        });
+        restartImage = findViewById(R.id.restart_image);
+        restartImage.setOnClickListener(v->{
+            gameAdapterReset();
+            gameView.setAdapter(gameAdapter);
+            startTime = System.currentTimeMillis();
+        });
+    }
+
+    private void gameAdapterReset() {
+        List<Point> data = new ArrayList<>();
+
+        int[][] tmpMap;
+
+        tmpMap = Generator.generate(count);
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                Point point = new Point(i, j, tmpMap[i][j]);
+                data.add(point);
+            }
+        }
+        gameAdapter = new GameAdapter(this, data);
+        gameAdapter.setMap(tmpMap);
+        tmpMap = Generator.getResMap();
+        gameAdapter.setResMap(tmpMap);
     }
 
     @Override

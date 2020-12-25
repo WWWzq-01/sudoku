@@ -19,7 +19,6 @@ public class LoginActivity extends AppCompatActivity {
     private int maxCount;
     private boolean clickable = true;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,18 +30,18 @@ public class LoginActivity extends AppCompatActivity {
         Button btnHard = findViewById(R.id.button_hard);
 
         btnEasy.setOnClickListener(v -> {
-            minCount = 41;
-            maxCount = 49;
+            minCount = 20;
+            maxCount = 30;
             start();
         });
         btnNormal.setOnClickListener(v -> {
-            minCount = 49;
-            maxCount = 56;
+            minCount = 30;
+            maxCount = 40;
             start();
         });
         btnHard.setOnClickListener(v -> {
-            minCount = 56;
-            maxCount = 66;
+            minCount = 40;
+            maxCount = 50;
             start();
         });
 

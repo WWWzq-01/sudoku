@@ -25,7 +25,10 @@ public class ColorHelper {
 
     public final int INPUT_NUM;
 
+    public final int HINT_NUM;
+
     public final int NO_CLICK_NUMBER;
+
 
     public ColorHelper(Context context) {
         this.NO_CLICK = ContextCompat.getColor(context, R.color.noClick);
@@ -36,5 +39,6 @@ public class ColorHelper {
         this.ERROR_NUM = ContextCompat.getColor(context, R.color.errorNum);
         this.INPUT_NUM = ContextCompat.getColor(context, R.color.inputNum);
         this.NO_CLICK_NUMBER = ContextCompat.getColor(context, R.color.noClickNumber);
+        this.HINT_NUM = ContextCompat.getColor(context,R.color.hintNum);
     }
 }
